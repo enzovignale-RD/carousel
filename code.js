@@ -4,25 +4,25 @@ function Log(arg) {
   console.log(arg);
 }
 
-function out(arg) {
-  document.getElementById("debug").innerHTML = arg;
-}
-function out2(arg) {
-  document.getElementById("debug2").innerHTML = arg;
-}
+// function out(arg) {
+//   document.getElementById("debug").innerHTML = arg;
+// }
+// function out2(arg) {
+//   document.getElementById("debug2").innerHTML = arg;
+// }
 //---------------------------------------------------------------------------------------------------
 
 //Carousel
 var Carousel = function () {
   // var defs and int
-  var me = this;
+  //var me = this;
 
   //Configuration variables
   var carouselW = 600;
   var carouselH = 300;
   var itemW = 100;
   var itemH = 200;
-  var noOfItemToAdd = 3;
+  var numberOfItemToAdd = 2;
 
   //Working variables (DO NOT MODIFY)
   var carousel = document.getElementById("carousel");
@@ -33,43 +33,51 @@ var Carousel = function () {
   var deg = 0;
   var rangeX = carouselW - itemW;
   var rangeY = carouselH - itemH;
-  var itemDegreeSeparation = 360 / (noOfItemToAdd);
+  var itemDegreeSeparation = 360 / (numberOfItemToAdd);
 
   var itemCount = 1;
+  var reqanimationreference;
   var tweenObject = {
     deg:0
   }
 
   //Simulate construction from other languages
-  init();//TODO: do i need this?
+  init();//TODO: do i need this? -> Yes
+
+
 
   //Constructor (not a js constructor)
   function init() {
-    //Log("Carousel.init()");
-    // Add items
-    for(var i=0; i < noOfItemToAdd/*items.length*/; i++){
-      addItem();
-    }
     //Attache event listener
     btnPrevious.addEventListener('click',btnPreviousClickHandler);
-    btnNext.addEventListener('click',btnNextClickHandler);
+    btnNext.addEventListener('click',btnNextClickHandler);  
+    // Add items
+    for(var i=0; i < numberOfItemToAdd/*items.length*/; i++){
+      addItem();
+    }
+
     // Start Animation
     animate();
   }
-
-  function btnPreviousClickHandler(e){
+//---------------------------------------------------------------------------------------------------
+//***************Method to just control button***************//
+function btnPreviousClickHandler(e){
     Log("btnPreviousClickHandler");
+
+    cancelAnimationFrame(reqanimationreference);
+
   }
   function btnNextClickHandler(e){
     Log("btnNextClickHandler");
     // var targetDeg = tweenObject.deg + itemDegreeSeparation;
     // TweenMax.to(tweenObject,1,{deg:targetDeg, onUpdate:animate})
     //deg += 180;
-    animate();
+    //animate();
+    
+    requestAnimationFrame(animate);
   }
-
+//---------------------------------------------------------------------------------------------------
   function addItem(){
-    //Log("Carousel.addItem()");
     var item = document.createElement("div");
     item.classList.add("item");
 
@@ -87,15 +95,13 @@ var Carousel = function () {
     itemCount++;
   }
 
-  function animate(){
-
+  function animate(first = .5){
       deg += .5;//<======  This need to change
-      //out2(deg);
       for(var i=0; i < items.length; i++){
         var itemDeg = deg /* tweenObject.deg */ +(itemDegreeSeparation * i);
+        console.log(deg+"<-- Deg        itemDegreeSeparation-->"+itemDegreeSeparation+"    -->Value i"+i);
         var sin = 0.5 + Math.sin(degToRad(itemDeg)) * 0.5;
-        //out(itemDegreeSeparation);
-        //out(deg);
+        console.log(itemDegreeSeparation);
         var cos = 0.5 + Math.cos(degToRad(itemDeg)) * 0.5;
         var itemObject = items[i];
         var posX = sin*rangeX;
@@ -113,16 +119,29 @@ var Carousel = function () {
         // itemObject.carouselItem.style.opacity = opacity;
         itemObject.carouselItem.style.opacity = cos;
       }
+
+
+      //TODO: Take a second look at this if statement
       if(deg < itemDegreeSeparation){
-        requestAnimationFrame(animate);//<==========  This need to change
+        reqanimationreference = requestAnimationFrame(animate);//<==========  This need to change
       }
       else{
+        
+        //TODO: Added
+        cancelAnimationFrame(reqanimationreference); 
+        //itemDegreeSeparation = 360 / (numberOfItemToAdd);
         deg = 0;
       }
 
+      //reqanimationreference = requestAnimationFrame(animate);// This will make it to run non stop
+      /*
+      myReq = requestAnimationFrame(step);
+// the cancelation uses the last requestId
+cancelAnimationFrame(myReq);
+      */
   }
 
-
+//---------------------------------------------------------------------------------------------------
   //Utility Function
 
   function degToRad(input) {
